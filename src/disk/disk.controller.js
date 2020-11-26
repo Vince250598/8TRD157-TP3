@@ -1,21 +1,21 @@
 import httpStatus from 'http-status';
 import { validationResult } from 'express-validator';
 
-import Task from './task.model';
+import Disk from './disk.model';
 import apiError from '../utils/api.error';
 
-class TaskController {
-  async getTasks(req, res, next) {
+class DiskController {
+  async getDisks(req, res, next) {
     try {
-      const tasks = await Task.find().exec();
+      const disks = await Disk.find().exec();
 
-      if (!tasks) {
-        return next(new apiError('Failed to get tasks', httpStatus.NOT_FOUND));
+      if (!disks) {
+        return next(new apiError('Failed to get disks', httpStatus.NOT_FOUND));
       }
 
       const data = {
-        total: tasks.length,
-        tasks: tasks
+        total: disks.length,
+        disks: disks
       };
 
       res.status(httpStatus.OK).json({
@@ -27,19 +27,19 @@ class TaskController {
     }
   }
 
-  async getTask(req, res, next) {
+  async getDisk(req, res, next) {
     const id = req.params.id;
 
     try {
-      const task = await Task.findOne({ _id: id }).exec();
+      const disk = await Disk.findOne({ _id: id }).exec();
 
-      if (!task) {
-        return next(new apiError('Task not found', httpStatus.NOT_FOUND));
+      if (!disk) {
+        return next(new apiError('Disk not found', httpStatus.NOT_FOUND));
       }
 
       res.status(httpStatus.OK).json({
         data: {
-          task: task
+          disk: disk
         },
         message: 'success'
       });
@@ -48,7 +48,7 @@ class TaskController {
     }
   }
 
-  async addTask(req, res, next) {
+  async addDisk(req, res, next) {
     const bodyErrors = validationResult(req);
 
     if (!bodyErrors.isEmpty()) {
@@ -57,24 +57,24 @@ class TaskController {
       );
     }
 
-    const task = new Task();
-    task.name = req.body.name.toLowerCase();
+    const disk = new Disk();
+    disk.title = req.body.title.toLowerCase();
 
     try {
-      await task.save();
+      await disk.save();
     } catch (error) {
       return next(
-        new apiError('Failed to create new task', httpStatus.INTERNAL_SERVER_ERROR)
+        new apiError('Failed to create new disk', httpStatus.INTERNAL_SERVER_ERROR)
       );
     }
 
     res.status(httpStatus.OK).json({
-      data: task,
-      message: 'Task successfully created'
+      data: disk,
+      message: 'Disk successfully created'
     });
   }
 
-  async updateTask(req, res, next) {
+  async editDisk(req, res, next) {
     const bodyErrors = validationResult(req);
 
     if (!bodyErrors.isEmpty()) {
@@ -85,48 +85,43 @@ class TaskController {
 
     const id = req.params.id;
 
-    const data = {
-      name: req.body.name.toLowerCase(),
-      state: req.body.state.toLowerCase()
-    };
-
     try {
-      const task = await Task.findOneAndUpdate({ _id: id }, data, {
+      const disk = await Disk.findOneAndUpdate({ _id: id }, req.body, {
         new: true
       }).exec();
 
-      if (!task) {
+      if (!disk) {
         return next(
-          new apiError('Task is not found and cannot be updated', httpStatus.NOT_FOUND)
+          new apiError('Disk is not found and cannot be updated', httpStatus.NOT_FOUND)
         );
       }
 
       res.status(httpStatus.OK).json({
         data: {
-          task: task
+          disk: disk
         },
-        message: `Task successfully updated`
+        message: `Disk successfully updated`
       });
     } catch (error) {
       return next(new apiError(error.message, httpStatus.INTERNAL_SERVER_ERROR));
     }
   }
 
-  async deleteTask(req, res, next) {
+  async deleteDisk(req, res, next) {
     const id = req.params.id;
 
     try {
-      const task = await Task.remove({ _id: id }).exec();
+      const disk = await Disk.remove({ _id: id }).exec();
 
-      if (!task) {
+      if (!disk) {
         return next(
-          new apiError('Task is not found and cannot be deleted', httpStatus.NOT_FOUND)
+          new apiError('Disk is not found and cannot be deleted', httpStatus.NOT_FOUND)
         );
       }
 
       res.status(httpStatus.OK).json({
-        data: task,
-        message: 'Task successfully deleted'
+        data: disk,
+        message: 'Disk successfully deleted'
       });
     } catch (error) {
       return next(new apiError(error.message, httpStatus.INTERNAL_SERVER_ERROR));
@@ -134,4 +129,4 @@ class TaskController {
   }
 }
 
-export default new TaskController();
+export default new DiskController();

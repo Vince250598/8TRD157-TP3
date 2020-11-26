@@ -13,7 +13,7 @@ import apiError from './utils/api.error';
 
 import mongo from './db/mongo';
 
-import tasksRoutes from './task/task.routes';
+import disksRoutes from './disk/disk.routes';
 
 const conf = appConf.getConf();
 const isDev = conf.env === 'development';
@@ -33,7 +33,7 @@ app.use(cors());
 
 mongo.start();
 
-APIv1.use('/v1/tasks', tasksRoutes);
+APIv1.use('/v1/disks', disksRoutes);
 app.use('/api', APIv1);
 
 app.use((req, res, next) => {
