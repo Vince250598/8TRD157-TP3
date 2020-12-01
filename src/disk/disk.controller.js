@@ -59,6 +59,8 @@ class DiskController {
 
     const disk = new Disk();
     disk.title = req.body.title.toLowerCase();
+    disk.artists = req.body.artists;
+    disk.styles = req.body.styles;
 
     try {
       await disk.save();
